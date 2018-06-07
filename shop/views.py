@@ -1,7 +1,17 @@
+from __future__ import unicode_literals
+
 from django.shortcuts import render
+from shop.models import Category, Product
+
 
 # Create your views here.
 
 
-def hello_world(request):
-    return render(request, 'main.html', {})
+def base_view(request):
+    categories = Category.object.all()
+    products = Product.object.all()
+    context = {
+        'categories': categories,
+        'products': products
+    }
+    return render(request, 'main.html', context)
