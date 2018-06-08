@@ -79,7 +79,7 @@
                   <div class="row">
                       <div class="col-sm-3">
                           <a href="index.html" class="navbar-brand logo">
-                                <img src="images/logo.png" alt="" class="img-responsive">
+                                <img src="static/images/logo.png" alt="" class="img-responsive">
                               </a>
                       </div>
                       <div class="col-sm-9">
@@ -93,34 +93,18 @@
               </div>
             </div>
             <!-- /.col 4 -->
-
+{% for category in categories %}
             <div class="col-sm-4">
               <select class="form-control">
                 <option value="0" selected="selected">
                   Select your categorie
-                {% for category in categories %}
                 </option>
-                <option value="1">
+                <option value="int(category)">
                   All
                 </option>
-                <option value="2">
-                  Travel
-                </option>
-                <option value="3">
-                  Beauty &amp; Spas
-                </option>
-                <option value="4">
-                  Career &amp; skills
-                </option>
-                <option value="5">
-                  Food &amp; Drinks
-                </option>
-                <option value="6">
-                  Health &amp; Beauty
-                </option>
-                {% endfor %}
               </select>
             </div>
+{% endfor %}
             <!-- /.col 3 -->
             <div class="col-sm-4">
               <a class="btn btn-raised ripple-effect btn-default btn-block" href="results.html">
@@ -280,109 +264,18 @@
                 </div>
                 <!-- Sidebar navigation -->
                 <ul class="nav sidebar-nav">
-                  <li class="dropdown">
-                    <a class="ripple-effect dropdown-toggle" href="#" data-toggle="dropdown">
-                      <i class="ti-shine">
-                      </i>
-                      Travel
-                      <span class="sidebar-badge">
-                        12
-                      </span>
-                      <b class="caret">
-                      </b>
-                    </a>
-                    <ul class="dropdown-menu">
-                      <li>
-                        <a href="#" tabindex="-1">
-                          Europe
-                          <span class="sidebar-badge">
-                            12
-                          </span>
-                        </a>
-                      </li>
-
-                    </ul>
-                  </li>
+{% for category in categories %}
                   <li>
-                    <a href="#">
+                    <a href="{{ category.slug }}">
                       <i class="ti-gift">
                       </i>
-                      Gifts
+                          {{ category.name }}
                       <span class="sidebar-badge">
                         3
                       </span>
                     </a>
                   </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-shopping-cart">
-                      </i>
-                      Products
-                      <span class="sidebar-badge">
-                        456
-                      </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-ticket">
-                      </i>
-                      Tickets
-                      <span class="sidebar-badge badge-circle">
-                        12
-                      </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-pulse">
-                      </i>
-                      Health
-                      <span class="sidebar-badge badge-circle">
-                        45
-                      </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-direction-alt">
-                      </i>
-                      Things To Do
-                      <span class="sidebar-badge badge-circle">
-                        117
-                      </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-cut">
-                      </i>
-                      Fashion
-                      <span class="sidebar-badge badge-circle">
-                        117
-                      </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-music-alt">
-                      </i>
-                      Fun Stuff
-                      <span class="sidebar-badge badge-circle">
-                        117
-                      </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-harddrives">
-                      </i>
-                      Electronics
-                      <span class="sidebar-badge badge-circle">
-                        117
-                      </span>
-                    </a>
-                  </li>
+{% endfor %}
                 </ul>
                 <!-- Sidebar divider -->
               </div>
@@ -1571,7 +1464,7 @@
       <footer id="footer">
         <div class="container">
           <div class="col-sm-4">
-            <img src="./static/images/logo-dark.png" alt="#" class="img-responsive logo">
+            <img src="static/images/logo-dark.png" alt="#" class="img-responsive logo">
             <p>
               Kupon,travel deals &amp; publishing,with minimal design. We provide you with the latest fresh inspiration straight from the industrie.
             </p>

@@ -36,8 +36,14 @@ def image_folder(instance, filename):
     return "{0}/{1}".format(instance.slug, filename)
 
 
+class ProductManager(models.Manager):
+
+    def all(self, *args, **kwargs):
+        return super(ProductManager, self).get_queryset().filter(available=True)
+
+
 class Product(models.Model):
-    object = models.Manager()
+    object = ProductManager()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     title = models.CharField(max_length=124)
@@ -49,3 +55,4 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
