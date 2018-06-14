@@ -43,7 +43,7 @@ def image_folder(instance, filename):
 class ProductManager(models.Manager):
 
     def all(self, *args, **kwargs):
-        return super(ProductManager, self).get_queryset().filter(available=True)
+        return super(ProductManager, self).get_queryset().filter()
 
 
 class Product(models.Model):
@@ -53,7 +53,7 @@ class Product(models.Model):
     title = models.CharField(max_length=124)
     slug = models.SlugField()
     description = models.TextField()
-    image = models.ImageField(upload_to="images", null=True)
+    image = models.ImageField(upload_to="images/products", null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
     available = models.BooleanField(default=True)
 
@@ -64,3 +64,22 @@ class Product(models.Model):
         return reverse('product_detail', kwargs={'product_slug': self.slug})
 
 
+class CartItem(models.Model):
+
+    object = ProductManager()
+    product = models.ForeignKey(Product, on_delete=True)
+    qty = models.PositiveIntegerField(default=1)
+    item_total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
+
+    def __unicode__(self):
+        return "Cart item for product {0}".format(self.product.title)
+
+
+class Cart(models.Model):
+
+    object = ProductManager()
+    items = models.ManyToManyField(CartItem, blank=True)
+    cart_total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
+
+    def __unicode__(self):
+        return str(self.id)

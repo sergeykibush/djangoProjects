@@ -63,10 +63,10 @@
                             </a>
                           </li>
                           <li>
-                            <a href="#">
+                            <a href="{% url 'cart' %}">
                               <i class="ti-shopping-cart">
                               </i>
-                              Cart
+                              Cart <span class="badge"> {{ cart.count }}</span>
                             </a>
                           </li>
                         </ul>
@@ -221,7 +221,7 @@
                                 </ul>
                               </li>
                               <li>
-                                <a href="results.html">
+                                <a href="">
                                      <i class=" ti-list-ol">
                                   </i>
 

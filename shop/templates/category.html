@@ -1,5 +1,93 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<div class="col-sm-12">
+    <h2>{{ category.name }}</h2>
+    <hr>
+{% for product in products_of_category %}
+    <div class="col-sm-4">
+       <img src="{{ product.image.url }}" style="width:80%; height:250px;">
+        <h4 class="text-center">{{ product.title }}</h4>
+        <p>Price: {{ product.price }}</p>
+        <a href="#"><button class="btn btn-danger">Add to cart</button> </a>
+    </div>
+{% endfor %}
+</div>
 
+{% for product in products_of_category %}
+<div class="col-sm-6">
+                  <div class="deal-entry  orange">
+                    <div class="offer-discount">
+                      -55%
+                    </div>
+                    <div class="image">
+                      <a href="#" target="_blank" title="#">
+                          <img src="{{ product.image.url }}" alt="#" class="img-responsive" >
+                      </a>
+                      <span class="bought">
+                        <i class="ti-tag">
+                        </i>
+                        169
+                      </span>
+                    </div>
+                    <!-- /.image -->
+                    <div class="title">
+                      <a href="#" target="_blank" title="{{ product.title }}">
+{{ product.description }}
+                      </a>
+                    </div>
+                    <div class="entry-content">
+                      <div class="prices clearfix">
+                        <div class="procent">
+                          -65%
+                        </div>
+                        <div class="price">
+                          <i class="ti-money">
+                          </i>
+
+                          <b>
+{{ product.price }}
+                          </b>
+                        </div>
+                        <div class="old-price">
+                          <span>
+                            <i class="ti-money">
+                            </i>
+                            171,00
+                          </span>
+                        </div>
+                      </div>
+                      <p>
+                        Immerse Yourself in the Magic of Cambodia with a Luxurious Eight Day/Seven Night Escape at Two of the World’s Finest Hotels!
+                      </p>
+                    </div>
+                    <!--/.entry content -->
+                    <footer class="info_bar clearfix">
+                      <ul class="unstyled list-inline row">
+                        <li class="time col-sm-7 col-xs-6 col-lg-8">
+                          <i class="ti-timer">
+                          </i>
+                          <b>
+                            8
+                          </b>
+                          d.
+                          <b>
+                            20
+                          </b>
+                          st.
+                          <b>
+                            58
+                          </b>
+                          min.
+                        </li>
+                        <li class="info_link col-sm-5 col-xs-6 col-lg-4">
+                          <a href="#" class="btn btn-block btn-default btn-raised btn-sm">
+                            View Deal
+                          </a>
+                        </li>
+                      </ul>
+                    </footer>
+                  </div>
+                </div>
+{% endfor %}
 {% endblock content%}
