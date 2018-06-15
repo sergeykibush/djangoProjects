@@ -67,8 +67,7 @@
                             </i>
                                                 </button>
                                                 <button class="btn-danger btn-raised ripple-effect">
-                                                    <i class="ti-trash">
-                            </i>
+                                                    <a href='{% url "remove_from_cart" product_slug=item.product.slug %}'><i class="ti-trash"></i></a>
                                                 </button>
 
                                             </div>
@@ -90,7 +89,7 @@
                     </span> 1500.00
                                 </td>
                             </tr>
-
+{% endfor %}
 
                         </tbody>
 
@@ -152,7 +151,6 @@
                                     </table>
                                 </td>
                             </tr>
-{% endfor %}
                         </tbody>
                     </table>
 
