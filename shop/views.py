@@ -108,6 +108,6 @@ def remove_from_cart_view(request, product_slug):
     product = Product.object.get(slug=product_slug)
     for cart_item in cart.items.all():
         if cart_item.product == product:
-            cart.items.remove(cart_item)
+            cart_item.delete()
             cart.save()
             return HttpResponseRedirect('/cart/')
