@@ -83,3 +83,22 @@ class Cart(models.Model):
 
     def __unicode__(self):
         return str(self.id)
+
+    def add_to_cart(self, product_slug):
+        cart = self
+        product = Product.object.get(slug=product_slug)
+        new_item, _ = CartItem.object.get_or_create(product=product, item_total=product.price)
+        if new_item not in cart.items.all():
+            cart.items.add(new_item)
+            cart.save()
+        return
+
+    def remove_from_cart(self, product_slug):
+        cart = self
+        product = Product.object.get(slug=product_slug)
+        for cart_item in cart.items.all():
+            if cart_item.product == product:
+                cart_item.delete()
+                cart.save()
+        return
+

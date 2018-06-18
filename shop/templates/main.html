@@ -66,7 +66,7 @@
                             <a href="{% url 'cart' %}">
                               <i class="ti-shopping-cart">
                               </i>
-                              Cart <span class="badge"> {{ cart.count }}</span>
+                              Cart <span class="badge" id="cart_count"> {{ cart.items.count }}</span>
                             </a>
                           </li>
                         </ul>
@@ -606,7 +606,7 @@
 
                   <div class="image">
                     <a href="{{ product.get_absolute_url }}" target="_blank" title="#">
-                        <img src="{{ product.image }}" alt="#" class="img-responsive">
+                        <img src="{{ product.image.url }}" alt="#" class="img-responsive">
                     </a>
                     <span class="bought">
                       <i class="ti-tag">
@@ -1183,7 +1183,8 @@
       </footer>
   </div>
   <!-- /animitsion -->
-  <!-- JS files -->
+
+     <!-- JS files -->
   <script src="{% static 'js/jquery.min.js' %}">
   </script>
   <script src="{% static 'js/kupon.js' %}">
@@ -1198,6 +1199,7 @@
   </script>
   <script src="{% static 'js/plugins.js' %}">
   </script>
+
 
 
     </body>

@@ -1,5 +1,5 @@
 {% extends 'main.html' %}
-
+{% load static %}
 {% block content %}
 
 <section id="inner-page" class="container">
@@ -305,7 +305,6 @@
                                                         <!-- comment start -->
                                                         <div class="comment clearfix">
                                                             <div class="comment-avatar">
-                                                                <img src="images/avatar-2.jpg" alt="avatar">
                                                             </div>
                                                             <header>
                                                                 <h3>
@@ -459,11 +458,9 @@
                         </h1>
                                 </div>
                                 <div class="buy-now mBtm-30">
-                                    <a class="btn btn-danger btn-lg btn-raised ripple-effect btn-block" data-toggle="modal" data-target="#myModal">
-                          <a href="{% url 'add_to_cart' product_slug=product.slug %}">BUY NOW</a>
-                          <span class="ink animate">
-                          </span>
-                        </a>
+                                    <a href="#" class="add_to_cart" data-slug="{{ product.slug }}"><button class="btn btn-danger btn-lg btn-raised ripple-effect btn-block" data-toggle="modal" data-target="#myModal">BUY NOW</button>
+                                        <span class="ink animate"></span>
+                                    </a>
                                 </div>
                                 <div class="dealAttributes">
                                     <div class="valueInfo bg-light shadow">
@@ -729,5 +726,26 @@ Pinterest get data from the same Open Graph meta tags Facebook uses
                 </div>
             </div>
         </div>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+    <script>
+    $(document).ready(function(){
+        $('.add_to_cart').on('click', function(e){
+            e.preventDefault()
+            product_slug = $(this).attr('data-slug')
+            data = {
+                product_slug: product_slug
+            }
+            $.ajax({
+                type: "GET",
+                url: '{% url "add_to_cart" %}',
+                data: data,
+                success: function(data){
+                    $("#cart_count").html(data.cart_total)
+                }
+            })
+        })
+    })
+    </script>
 
 {% endblock content%}

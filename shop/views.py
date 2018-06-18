@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
+from django.urls import reverse
 from shop.models import Category, Product, CartItem, Cart
+from decimal import Decimal
 
 
 # Create your views here.
@@ -75,9 +77,7 @@ def cart_view(request):
     return render(request, 'cart.html', context)
 
 
-def add_to_cart_view(request, product_slug):
-    product = Product.object.get(slug=product_slug)
-    new_item, _ = CartItem.object.get_or_create(product=product, item_total=product.price)
+def add_to_cart_view(request):
     try:
         cart_id = request.session['cart_id']
         cart = Cart.object.get(id=cart_id)
@@ -88,13 +88,13 @@ def add_to_cart_view(request, product_slug):
         cart_id = cart.id
         request.session['cart_id'] = cart_id
         cart = Cart.object.get(id=cart_id)
-    if new_item not in cart.items.all():
-        cart.items.add(new_item)
-        cart.save()
-    return HttpResponseRedirect('/cart/')
+    product_slug = request.GET.get('product_slug')
+    product = Product.object.get(slug=product_slug)
+    cart.add_to_cart(product.slug)
+    return JsonResponse({'cart_total':cart.items.count()})
 
 
-def remove_from_cart_view(request, product_slug):
+def remove_from_cart_view(request):
     try:
         cart_id = request.session['cart_id']
         cart = Cart.object.get(id=cart_id)
@@ -105,9 +105,27 @@ def remove_from_cart_view(request, product_slug):
         cart_id = cart.id
         request.session['cart_id'] = cart_id
         cart = Cart.object.get(id=cart_id)
+    product_slug = request.GET.get('product_slug')
     product = Product.object.get(slug=product_slug)
-    for cart_item in cart.items.all():
-        if cart_item.product == product:
-            cart_item.delete()
-            cart.save()
-            return HttpResponseRedirect('/cart/')
+    cart.remove_from_cart(product.slug)
+    return JsonResponse({'cart_total':cart.items.count()})
+
+
+def change_item_qty(request):
+    try:
+        cart_id = request.session['cart_id']
+        cart = Cart.object.get(id=cart_id)
+        request.session['total'] = cart.items.count()
+    except:
+        cart = Cart()
+        cart.save()
+        cart_id = cart.id
+        request.session['cart_id'] = cart_id
+        cart = Cart.object.get(id=cart_id)
+    qty = request.GET.get('qty')
+    item_id = request.GET.get('item_id')
+    cart_item = CartItem.object.get(id=int(item_id))
+    cart_item.qty = int(qty)
+    cart_item.item_total = int(qty) * cart_item.product.price
+    cart_item.save()
+    return JsonResponse({'cart_total':cart.items.count(), 'item_total': cart_item.item_total})

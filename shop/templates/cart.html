@@ -1,5 +1,5 @@
 {% extends 'main.html' %}
-
+{% load static %}
 {% block content %}
 <section id="page">
             <div class="container">
@@ -30,7 +30,7 @@
                         </thead>
                         <tbody>
 {% for item in cart.items.all %}
-                            <tr>
+                            <tr class="cart-item-{{ item.product.id }}">
                                 <td class="image hidden-xs">
                                     <img src="http://placehold.it/150x150" alt="product">
                                 </td>
@@ -67,7 +67,7 @@
                             </i>
                                                 </button>
                                                 <button class="btn-danger btn-raised ripple-effect">
-                                                    <a href='{% url "remove_from_cart" product_slug=item.product.slug %}'><i class="ti-trash"></i></a>
+                                                    <a href='#' class="remove_from_cart" data-slug="{{ item.product.slug }}" data-id="{{ item.product.id }}"><i class="ti-trash"></i></a>
                                                 </button>
 
                                             </div>
@@ -75,18 +75,23 @@
                                     </div>
                                 </td>
                                 <td class="qty">
-                                    <input type="text" value="{{ item.qty }}" name="qty">
+                                    <form action="" method="GET">
+                                        <input type="number" name="qty" class="cart-item-qty" data-id="{{ item.id }}" value="{{ item.qty }}" min="1">
+                                    </form>
+
                                 </td>
                                 <td class="unit-price hidden-xs">
+                                    <!--old === unit-price hidden-xs-->
+                                    <span class="currency">
+                      $
+                    </span>
+{{ item.product.price }}
+                                </td>
+                                <td class="total-price" id="cart-item-total-{{ item.id }}">
                                     <span class="currency">
                       $
                     </span>
 {{ item.item_total }}
-                                </td>
-                                <td class="total-price">
-                                    <span class="currency">
-                      $
-                    </span> 1500.00
                                 </td>
                             </tr>
 {% endfor %}
@@ -197,4 +202,49 @@
                 </div>
             </div>
         </div>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+    <script>
+    $(document).ready(function(){
+        $('.remove_from_cart').on('click', function(e){
+            e.preventDefault()
+            product_slug = $(this).attr('data-slug')
+            item_product_id = $(this).attr('data-id')
+            console.log(item_product_id)
+            data = {
+                product_slug: product_slug
+            }
+
+            $.ajax({
+                type: "GET",
+                url: '{% url "remove_from_cart" %}',
+                data: data,
+                success: function(data){
+                    $("#cart_count").html(data.cart_total)
+                    $('.cart-item-'+item_product_id).css('display', 'none')
+                }
+            })
+        })
+    })
+    $(document).ready(function(){
+        $('.cart-item-qty').on('click', function(){
+            qty = $(this).val()
+            item_id = $(this).attr('data-id')
+            data = {
+                qty: qty,
+                item_id: item_id
+            }
+            $.ajax({
+                type: "GET",
+                url: '{% url "change_item_qty" %}',
+                data: data,
+                success: function(data){
+                    $('#cart-item-total-'+item_id).html(parseFloat(data.item_total).toFixed(2))
+                }
+            })
+
+        })
+    })
+    </script>
+
 {% endblock content%}
