@@ -63,10 +63,15 @@
                             </a>
                           </li>
                           <li>
+                            <a href="{% url 'profile' %}">
+                              Profile
+                            </a>
+                          </li>
+                          <li>
                             <a href="{% url 'cart' %}">
                               <i class="ti-shopping-cart">
                               </i>
-                              Cart <span class="badge" id="cart_count"> {{ cart.items.count }}</span>
+                              Cart <span class="badge" id="cart_count">{% if not request.session.total %} 0 {% else %} {{ request.session.total }} {% endif %}</span>
                             </a>
                           </li>
                         </ul>
@@ -413,16 +418,6 @@
                               </span>
                               <span class="share-count is-loaded">288</span>
                             </a>
-                            <!-- https://dev.twitter.com/docs/intents -->
-                            <a target="_blank" href="http://twitter.com/share?url=http://themeforest.net/user/codenpixel" class="share-twitter">
-                              <span class="icon icon-twitter">
-                              </span>
-                              <span class="share-title">
-                                Tweet
-                              </span>
-                              <span class="share-count is-loaded">78</span>
-                            </a>
-
                           </div>
                           <!--/.social sharing -->
                         </div>
@@ -548,18 +543,6 @@
                               </span>
                               <span class="share-count is-loaded">288</span>
                             </a>
-                            <!-- https://dev.twitter.com/docs/intents -->
-                            <a target="_blank" href="http://twitter.com/share?url=http://themeforest.net/user/codenpixel" class="share-twitter">
-                              <span class="icon icon-twitter">
-                              </span>
-
-                              <span class="share-title">
-
-                                Tweet
-                              </span>
-                              <span class="share-count is-loaded">78</span>
-                            </a>
-
                           </div>
                           <!--/.social sharing -->
                         </div>
@@ -665,9 +648,11 @@
                         min.
                       </li>
                       <li class="info_link col-sm-5 col-xs-6 col-lg-4">
-                        <a href="#" class="btn btn-block btn-default btn-raised btn-sm">
-                          View Deal
-                        </a>
+                        <div class="buy-now mBtm-30">
+                            <a href="#" class="add_to_cart" data-slug="{{ product.slug }}"><button class="btn btn-danger btn-lg btn-raised ripple-effect btn-block" data-toggle="modal" data-target="#myModal">BUY NOW</button>
+                                <span class="ink animate"></span>
+                            </a>
+                        </div>
                       </li>
                     </ul>
                   </footer>
@@ -1200,7 +1185,25 @@
   <script src="{% static 'js/plugins.js' %}">
   </script>
 
-
+      <script>
+        $(document).ready(function(){
+        	$('.add_to_cart').on('click', function(e){
+        		e.preventDefault()
+        		product_slug = $(this).attr('data-slug')
+        		data = {
+        			product_slug: product_slug
+        		}
+        		$.ajax({
+        			type: "GET",
+        			url: '{% url "add_to_cart" %}',
+        			data: data,
+          			success: function(data){
+          				$("#cart_count").html(data.cart_total)
+          			}
+        		})
+        	})
+        })
+    </script>
 
     </body>
 </html>

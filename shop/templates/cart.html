@@ -2,10 +2,12 @@
 {% load static %}
 {% block content %}
 <section id="page">
+
+  {% if cart_total > 0 %}
             <div class="container">
 
                 <!-- Cart -->
-                <div class="cart shadow">
+                <div class="cart-shadow">
 
                     <!-- Cart Contents -->
                     <table class="cart-contents">
@@ -32,7 +34,7 @@
 {% for item in cart.items.all %}
                             <tr class="cart-item-{{ item.product.id }}">
                                 <td class="image hidden-xs">
-                                    <img src="http://placehold.it/150x150" alt="product">
+                                    <img src="{{ item.product.image.url }}" alt="product">
                                 </td>
                                 <td class="details">
                                     <div class="clearfix">
@@ -148,8 +150,8 @@
                                                 <td class="cart-total">
                                                     total
                                                 </td>
-                                                <td class="cart-total price">
-                                                    $ 5250.00
+                                                <td class="cart-total price" id='cart-total-price'>
+{{ cart.cart_total }}
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -167,7 +169,7 @@
                 <!-- Cart Buttons -->
                 <div class="cart-buttons clearfix mBtm-30">
 
-                    <a class="btn btn-raised btn-primary ripple-effect checkout" href="#">
+                    <a class="btn btn-raised btn-primary ripple-effect checkout" href="{% url 'checkout' %}">
                         <i class="ti-shopping-cart">
               </i> checkout
                     </a>
@@ -177,11 +179,18 @@
                     </a>
                 </div>
                 <!-- /Cart Buttons -->
-
             </div>
+<h3 class="cart-empty"></h3>
+
+{% else %}
+            <h3 class="text-center">Your cart is empty...</h3>
+
+
+{% endif %}
+
         </section>
         <!-- /#page ends -->
-        <div class="cta-box clearfix">
+        <!-- <div class="cta-box clearfix">
             <div class="container">
                 <div class="row">
                     <div class="col-md-3 col-sm-3 col-xs-12 pull-right">
@@ -201,11 +210,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
 <script src="{% static 'js/jquery.min.js' %}"></script>
     <script>
     $(document).ready(function(){
+        $('.cart-empty').css('display', 'none')
         $('.remove_from_cart').on('click', function(e){
             e.preventDefault()
             product_slug = $(this).attr('data-slug')
@@ -221,7 +231,14 @@
                 data: data,
                 success: function(data){
                     $("#cart_count").html(data.cart_total)
-                    $('.cart-item-'+item_product_id).css('display', 'none')
+                    $('.cart-item-'+item_product_id).css('display', 'none'),
+                    $('#cart-total-price').html(parseFloat(data.cart_total_price).toFixed(2) + '$')
+                    if(data.cart_total == 0){
+                      $('.cart-shadow').css('display', 'none')
+                      $('.cart-empty').css('display', 'block')
+                      $('.cart-buttons').css('display', 'none')
+                      $('.cart-empty').html('<h3 class="text-center">Your cart is empty...</h3>')
+                    }
                 }
             })
         })
@@ -234,12 +251,15 @@
                 qty: qty,
                 item_id: item_id
             }
+            console.log(data.qty)
             $.ajax({
                 type: "GET",
                 url: '{% url "change_item_qty" %}',
                 data: data,
                 success: function(data){
-                    $('#cart-item-total-'+item_id).html(parseFloat(data.item_total).toFixed(2))
+                    $('#cart-item-total-'+item_id).html('$ ' + parseFloat(data.item_total).toFixed(2))
+                    console.log(data.item_total);
+                    $('#cart-total-price').html('$ ' + parseFloat(data.cart_total_price).toFixed(2))
                 }
             })
 
@@ -247,4 +267,4 @@
     })
     </script>
 
-{% endblock content%}
+{% endblock content %}

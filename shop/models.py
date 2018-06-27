@@ -3,7 +3,9 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.utils.text import slugify
 from transliterate import translit
+from django.conf import settings
 from django.urls import reverse
+from decimal import Decimal
 # Create your models here.
 
 
@@ -102,3 +104,40 @@ class Cart(models.Model):
                 cart.save()
         return
 
+    def change_qty(self,qty, item_id):
+        cart = self
+        cart_item = CartItem.object.get(id=int(item_id))
+        cart_item.qty = int(qty)
+        cart_item.item_total = int(qty) * cart_item.product.price
+        cart_item.save()
+        new_cart_total = 0.00
+        for item in cart.items.all():
+            new_cart_total += float(item.item_total)
+        cart.cart_total = new_cart_total
+        cart.save
+
+
+ORDER_STATUS_CHOISES = {
+    ('Принят в обработку', 'Принят в обработку'),
+    ('Выполняется', 'Выполняется'),
+    ('Оплачен', 'Оплачен')
+}
+class Order(models.Model):
+
+    object = ProductManager()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=True)
+    items = models.ManyToManyField(Cart)
+    total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=40)
+    address = models.CharField(max_length=225)
+    buying_type = models.CharField(max_length=40, choices=(('Самовывоз', 'Самовывоз'), ('Доставка','Доставка')), default='Самовывоз')
+    date = models.DateTimeField(auto_now_add=True)
+    comments = models.TextField()
+    status = models.CharField(max_length=100, choices=ORDER_STATUS_CHOISES)
+
+
+
+    def __unicode__(self):
+        return "Order №{0}".format(str(self.id))
