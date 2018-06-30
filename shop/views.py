@@ -5,7 +5,10 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from shop.models import Category, Product, CartItem, Cart, Order
 from decimal import Decimal
-from shop.forms import OrderForms
+from shop.forms import OrderForms, RegistrationForm, LoginForm
+from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate
+
 
 
 # Create your views here.
@@ -169,26 +172,24 @@ def checkout_view(request):
     cart.save
     form = OrderForms(request.POST or None)
     if form.is_valid():
-        name = form.cleaned_data['name']
+        first_name = form.cleaned_data['name']
         last_name = form.cleaned_data['last_name']
         phone = form.cleaned_data['phone']
         buying_type = form.cleaned_data['buying_type']
         address = form.cleaned_data['address']
         comments = form.cleaned_data['comments']
-        new_order = Order()
-        new_order.user = request.user
-        new_order.save()
-        new_order.items.remove()
-        new_order.items.add(cart)
-        print(cart)
-        new_order.first_name = name
-        new_order.last_name = last_name
-        new_order.phone = phone
-        new_order.buying_type = buying_type
-        new_order.address = address
-        new_order.comments = comments
-        new_order.total = cart.cart_total
-        new_order.save()
+        print(buying_type)
+        new_order = Order.object.create(
+            user = request.user,
+            items = cart,
+            total = cart.cart_total,
+            first_name = first_name,
+            last_name = last_name,
+            phone = phone,
+            address = address,
+            buying_type = buying_type,
+            comments = comments,
+        )
         del request.session['cart_id']
         del request.session['total']
         return HttpResponseRedirect(reverse('thanks'))
@@ -201,8 +202,46 @@ def checkout_view(request):
 
 
 def profile_view(request):
-    order = Order.object.filter(user=request.user)
+    order = Order.object.filter(user=request.user).order_by('-id')
     context = {
-        'order' = order
+        'order': order
     }
-    return render(request=, 'profile.html', context)
+    return render(request, 'profile.html', context)
+def registration_view(request):
+    form = RegistrationForm(request.POST or None)
+    if form.is_valid():
+        new_user = form.save(commit=False)
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        email = form.cleaned_data['email']
+        first_name = form.cleaned_data['first_name']
+        last_name = form.cleaned_data['last_name']
+        new_user.username = username
+        new_user.set_password(password)
+        new_user.first_name = first_name
+        new_user.last_name = last_name
+        new_user.email = email
+        new_user.save()
+        login_user = authenticate(username=username, password=password)
+        if login_user:
+            login(request, login_user)
+            return HttpResponseRedirect(reverse('base'))
+    context = {
+        'form': form
+    }
+    return render(request, 'registration.html', context)
+
+
+def login_view(request):
+    form = LoginForm(request.POST or None)
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        login_user = authenticate(username=username, password=password)
+        if login_user:
+            login(request, login_user)
+            return HttpResponseRedirect(reverse('base'))
+    context = {
+        'form': form
+    }
+    return render(request, 'login.html', context)

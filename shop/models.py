@@ -1,4 +1,5 @@
 # from __future__ import unicode_literals
+from django.utils import timezone
 from django.db import models
 from django.db.models.signals import pre_save
 from django.utils.text import slugify
@@ -11,6 +12,7 @@ from decimal import Decimal
 
 class Category(models.Model):
     object = models.Manager()
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(blank=True)
 
@@ -31,7 +33,13 @@ pre_save.connect(pre_save_category_slug, sender=Category)
 
 
 class Brand(models.Model):
+    object = models.Manager()
+
     name = models.CharField(max_length=100)
+    web_site = models.CharField(max_length=100, null=True)
+    email = models.CharField(max_length=100, null=True)
+    phone = models.CharField(max_length=100, null=True)
+
 
     def __str__(self):
         return self.name
@@ -50,13 +58,29 @@ class ProductManager(models.Manager):
 
 class Product(models.Model):
     object = ProductManager()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     title = models.CharField(max_length=124)
     slug = models.SlugField()
     description = models.TextField()
+    size = models.CharField(max_length=10, choices=(('S', 'S'), ('M', 'M'), ('L', 'L'), ('XL', 'XL'), ('XXL', 'XXL')), null=True)
+    dimensions = models.CharField(max_length=40, null=True)
+    liters = models.IntegerField(null=True)
+    weight = models.CharField(max_length=20, null=True)
+    covers = models.CharField(max_length=10, choices=(('1', '1'), ('2', '2')), null=True)
+    material = models.CharField(max_length=100, choices=(
+        ('Оксфорд', 'Оксфорд'),
+        ('Оксфорд плотный 600d', 'Оксфорд плотный 600d'),
+        ('Микро-рогожка, Шотландия клетка, велюр Нью-Йорк(принт)', 'Микро-рогожка, Шотландия клетка, велюр Нью-Йорк(принт)'),
+        ('Кожзам Зевс, Плетенка 3D', 'Кожзам Зевс, Плетенка 3D'),
+        ('Хлопок', 'Хлопок'),
+        ('Велюр Кордрой', 'Велюр Кордрой'),
+        ('Велюр Мольберт цветы, Кристалл', 'Велюр Мольберт цветы, Кристалл'),
+        ), null=True)
     image = models.ImageField(upload_to="images/products", null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
+    marketing_price = models.DecimalField(max_digits=9, decimal_places=2, null=True)
     available = models.BooleanField(default=True)
 
     def __str__(self):
@@ -67,8 +91,8 @@ class Product(models.Model):
 
 
 class CartItem(models.Model):
-
     object = ProductManager()
+
     product = models.ForeignKey(Product, on_delete=True)
     qty = models.PositiveIntegerField(default=1)
     item_total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
@@ -78,8 +102,8 @@ class CartItem(models.Model):
 
 
 class Cart(models.Model):
-
     object = ProductManager()
+
     items = models.ManyToManyField(CartItem, blank=True)
     cart_total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
 
@@ -123,21 +147,19 @@ ORDER_STATUS_CHOISES = {
     ('Оплачен', 'Оплачен')
 }
 class Order(models.Model):
-
     object = ProductManager()
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=True)
-    items = models.ManyToManyField(Cart)
+    items = models.ForeignKey(Cart, on_delete=True)
     total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     phone = models.CharField(max_length=40)
     address = models.CharField(max_length=225)
-    buying_type = models.CharField(max_length=40, choices=(('Самовывоз', 'Самовывоз'), ('Доставка','Доставка')), default='Самовывоз')
+    buying_type = models.CharField(max_length=40, choices=(('Самовывоз', 'Самовывоз'), ('Доставка', 'Доставка')), default='Самовывоз')
     date = models.DateTimeField(auto_now_add=True)
     comments = models.TextField()
-    status = models.CharField(max_length=100, choices=ORDER_STATUS_CHOISES)
-
-
+    status = models.CharField(max_length=100, choices=ORDER_STATUS_CHOISES, default='Принят в обработку')
 
     def __unicode__(self):
-        return "Order №{0}".format(str(self.id))
+        return "Заказ №{0}".format(str(self.id))

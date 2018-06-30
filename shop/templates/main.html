@@ -36,42 +36,50 @@
             <div class="row">
               <div class="col-sm-6 list-inline list-unstyled no-margin hidden-xs">
                 <p class="no-margin">
-                  Have any questions?
+                  тел:
                   <strong>
-                    +080 124 880
+                    +38 093 4288 191
                               </strong>
-                              or mail@codenpixel.com
+                              E-mail: sergeykibush@gmail.com
                           </p>
                       </div>
                       <div class="pull-right col-sm-6">
                         <ul class="list-inline list-unstyled pull-right">
-                          <li class="active">
-                            <a href="#">
-                              <i class="ti-cart">
-                              </i>
-                              Faq
+{% if not request.user.is_authenticated %}
+                          <li>
+                            <a href="{% url 'login' %}">
+                              Вход
                             </a>
                           </li>
                           <li>
-                            <a href="#">
-                              Sign In
+                            <a href="{% url 'registration' %}">
+                              Регистрация
                             </a>
                           </li>
+{% else %}
                           <li>
-                            <a href="#">
-                              Sign Up
-                            </a>
+                          <p>Здравствуйте, {{ request.user }} </p>
                           </li>
                           <li>
                             <a href="{% url 'profile' %}">
-                              Profile
+                              Профиль
                             </a>
                           </li>
+                          <li>
+                            <a href="{% url 'logout' %}">
+                              Выйти
+                            </a>
+                          </li>
+{% endif %}
                           <li>
                             <a href="{% url 'cart' %}">
                               <i class="ti-shopping-cart">
                               </i>
-                              Cart <span class="badge" id="cart_count">{% if not request.session.total %} 0 {% else %} {{ request.session.total }} {% endif %}</span>
+                                {% if not request.session.total %}
+                                  <span class="badge" id="cart_count" display=none></span>
+                                {% else %}
+                                <span class="badge" id="cart_count" style="padding-left: 4px;padding-right: 4px;padding-top: 2px;padding-bottom: 2px;">{{ request.session.total }}</span>
+                                {% endif %}
                             </a>
                           </li>
                         </ul>
@@ -86,40 +94,6 @@
                           <a href="/" class="navbar-brand logo">
                                 <img src="{% static 'images/logo.png' %}" alt="" class="img-responsive">
                               </a>
-                      </div>
-                      <div class="col-sm-9">
-                          <div class="search-form">
-
-            <div class="col-sm-4">
-              <div class="row">
-                <div class="col-md-12">
-                  <input class="form-control" placeholder="Search..." type="text">
-                </div>
-              </div>
-            </div>
-            <!-- /.col 4 -->
-
-{% for category in categories %}
-            <div class="col-sm-4">
-              <select class="form-control">
-                <option value="0" selected="selected">
-                  Select your categorie
-                </option>
-                <option value="int(category)">
-                  All
-                </option>
-              </select>
-            </div>
-{% endfor %}
-            <!-- /.col 3 -->
-            <div class="col-sm-4">
-              <a class="btn btn-raised ripple-effect btn-default btn-block" href="results.html">
-                Search Deals
-              </a>
-            </div>
-            <!-- /.col 1 -->
-
-      </div>
                       </div>
                   </div>
               </div>
@@ -191,11 +165,6 @@
                                   <li>
                                     <a href="contact.html">
                                       Contact
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="faq.html">
-                                      FAQ page
                                     </a>
                                   </li>
                                   <li>
@@ -279,7 +248,6 @@
                       </i>
                           {{ category.name }}
                       <span class="sidebar-badge">
-                        3
                       </span>
                     </a>
                   </li>
